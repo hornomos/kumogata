@@ -47,13 +47,13 @@ class Kumogata::Client
 
     case output_format
     when :ruby
-      devaluate_template(template).chomp.colorize_as(:ruby)
+      devaluate_template(template).chomp
     when :json, :json5
-      JSON.pretty_generate(template).colorize_as(:json)
+      JSON.pretty_generate(template)
     when :yaml
-      YAML.dump(template).colorize_as(:yaml)
+      YAML.dump(template)
     when :js
-      '(' + JSON.pretty_generate(template).colorize_as(:json) + ')'
+      '(' + JSON.pretty_generate(template) + ')'
     when :coffee
       raise 'Output to CoffeeScript is not implemented'
     end
@@ -79,7 +79,7 @@ class Kumogata::Client
   def delete(stack_name)
     validate_stack_name(stack_name)
 
-    if @options.force? or agree("Are you sure you want to delete `#{stack_name}`? ".yellow)
+    if @options.force? or agree("Are you sure you want to delete `#{stack_name}`? ")
       delete_stack(stack_name)
     end
 
@@ -90,9 +90,7 @@ class Kumogata::Client
 
   def list(stack_name = nil)
     validate_stack_name(stack_name)
-
-    stacks = describe_stacks(stack_name)
-    JSON.pretty_generate(stacks).colorize_as(:json)
+    describe_stacks(stack_name)
   end
 
   def export(stack_name)
@@ -103,9 +101,9 @@ class Kumogata::Client
 
     case format
     when :ruby
-      devaluate_template(template).chomp.colorize_as(:ruby)
+      devaluate_template(template).chomp
     when :json
-      JSON.pretty_generate(template).colorize_as(:json)
+      JSON.pretty_generate(template)
     else
       raise "Unknown format: #{format}"
     end
@@ -115,21 +113,21 @@ class Kumogata::Client
     validate_stack_name(stack_name)
 
     events = describe_events(stack_name)
-    JSON.pretty_generate(events).colorize_as(:json)
+    JSON.pretty_generate(events)
   end
 
   def show_outputs(stack_name)
     validate_stack_name(stack_name)
 
     outputs = describe_outputs(stack_name)
-    JSON.pretty_generate(outputs).colorize_as(:json)
+    JSON.pretty_generate(outputs)
   end
 
   def show_resources(stack_name)
     validate_stack_name(stack_name)
 
     resources = describe_resources(stack_name)
-    JSON.pretty_generate(resources).colorize_as(:json)
+    JSON.pretty_generate(resources)
   end
 
   def diff(path_or_url1, path_or_url2)
@@ -336,7 +334,7 @@ class Kumogata::Client
       stack_name.gsub!(/[^-a-zA-Z0-9]+/, '-')
     end
 
-    Kumogata.logger.info("Creating stack: #{stack_name}".cyan)
+    Kumogata.logger.info("Creating stack: #{stack_name}")
     stack = @cloud_formation.stacks.create(stack_name, template.to_json, build_create_options)
 
     return if @options.detach?
@@ -366,7 +364,7 @@ class Kumogata::Client
     stack = @cloud_formation.stacks[stack_name]
     stack.status
 
-    Kumogata.logger.info("Updating stack: #{stack_name}".green)
+    Kumogata.logger.info("Updating stack: #{stack_name}")
     event_log = create_event_log(stack)
     stack.update(build_update_options(template.to_json))
 
@@ -390,7 +388,7 @@ class Kumogata::Client
     stack = @cloud_formation.stacks[stack_name]
     stack.status
 
-    Kumogata.logger.info("Deleting stack: #{stack_name}".red)
+    Kumogata.logger.info("Deleting stack: #{stack_name}")
     event_log = create_event_log(stack)
     stack.delete
 
@@ -490,7 +488,7 @@ class Kumogata::Client
 
         puts [
           timestamp.getlocal.strftime('%Y/%m/%d %H:%M:%S %Z'),
-          summary.to_json.colorize_as(:json),
+          summary.to_json
         ].join(': ')
       end
     end
@@ -594,10 +592,10 @@ class Kumogata::Client
       raise result.values_at(:code, :message).join(': ')
     end
 
-    Kumogata.logger.info('Template validated successfully'.green)
+    Kumogata.logger.info('Template validated successfully')
 
     if @options.verbose
-      Kumogata.logger.info(JSON.pretty_generate(JSON.parse(result.to_json)).colorize_as(:json))
+      Kumogata.logger.info(JSON.pretty_generate(JSON.parse(result.to_json)))
     end
   end
 
@@ -657,10 +655,10 @@ class Kumogata::Client
     puts <<-EOS
 
 Stack Resource Summaries:
-#{JSON.pretty_generate(summaries).colorize_as(:json)}
+#{JSON.pretty_generate(summaries)}
 
 Outputs:
-#{JSON.pretty_generate(outputs).colorize_as(:json)}
+#{JSON.pretty_generate(outputs)}
 EOS
 
     if @options.result_log?

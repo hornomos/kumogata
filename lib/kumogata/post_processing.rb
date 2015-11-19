@@ -281,7 +281,7 @@ class Kumogata::PostProcessing
 
     expected_outputs.each do |key|
       unless outputs.keys.include?(key)
-        $stderr.puts("[WARN] Undefined output: #{name} => #{key.inspect}".yellow)
+        $stderr.puts("[WARN] Undefined output: #{name} => #{key.inspect}")
       end
     end
   end
@@ -331,7 +331,7 @@ Command: #{name.intense_blue}
     status = status.to_i
 
     puts <<-EOS
-Status: #{status.zero? ? status : status.to_s.red}
+Status: #{status.zero? ? status : status.to_s}
     EOS
   end
 
