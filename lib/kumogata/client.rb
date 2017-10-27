@@ -2,7 +2,7 @@ class Kumogata::Client
   def initialize(options)
     @options = options
     @options = Hashie::Mash.new(@options) unless @options.kind_of?(Hashie::Mash)
-    @cloud_formation = AWS::CloudFormation.new
+    @cloud_formation = AWS::CloudFormation.new(:region => options.region)
     @outputs_filter = Kumogata::OutputsFilter.new(@options)
     @post_processing = Kumogata::PostProcessing.new(@options)
   end
